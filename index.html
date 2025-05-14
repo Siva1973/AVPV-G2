@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Active vs Passive Voice Game - Set 2</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to right, #fff1eb, #ace0f9);
+      color: #112d4e;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: 30px auto;
+      padding: 20px;
+      background: #ffffff;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+      border-radius: 8px;
+    }
+
+    h1 {
+      color: #3f72af;
+    }
+
+    .question-number {
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .question {
+      font-size: 20px;
+      margin-bottom: 20px;
+    }
+
+    .options {
+      list-style: none;
+      padding: 0;
+    }
+
+    .options li {
+      margin: 10px 0;
+      background: #e8f0fe;
+      padding: 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .options li:hover {
+      background: #cddcfa;
+    }
+
+    .correct {
+      background-color: #c8e6c9 !important;
+    }
+
+    .wrong {
+      background-color: #ffcdd2 !important;
+    }
+
+    .explanation {
+      margin-top: 15px;
+      font-style: italic;
+    }
+
+    .gif {
+      margin-top: 20px;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      background: #3f72af;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+
+    .btn:hover {
+      background: #2e5d8a;
+    }
+
+    .music-toggle {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background: #3f72af;
+      color: white;
+      padding: 10px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .scoreboard {
+      font-weight: bold;
+      margin-top: 10px;
+    }
+
+    audio {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="music-toggle" onclick="toggleMusic()">🔊 Toggle Music</div>
+  <audio id="backgroundMusic" loop autoplay>
+    <source src="https://www.bensound.com/bensound-music/bensound-buddy.mp3" type="audio/mpeg" />
+  </audio>
+
+  <div class="container">
+    <h1>Active or Passive Voice? - Set 2</h1>
+    <div id="quiz">
+      <div class="question-number" id="questionNumber"></div>
+      <div class="question" id="questionText"></div>
+      <ul class="options" id="optionsList"></ul>
+      <div class="explanation" id="explanation"></div>
+      <div class="gif" id="gifContainer"></div>
+      <div class="scoreboard" id="scoreBoard"></div>
+      <button class="btn" id="nextBtn" onclick="nextQuestion()" style="display: none;">Next Question</button>
+    </div>
+  </div>
+
+  <audio id="correctSound">
+    <source src="https://www.fesliyanstudios.com/play-mp3/4386" type="audio/mpeg" />
+  </audio>
+  <audio id="wrongSound">
+    <source src="https://www.fesliyanstudios.com/play-mp3/6677" type="audio/mpeg" />
+  </audio>
+
+  <script>
+    const questions = [
+      {
+        question: "The window ___ by a ball.",
+        options: ["broke", "was broken", "was breaking", "breaks"],
+        answer: 1,
+        explanation: "The window (subject) is not doing the action but receiving it. Hence passive voice is used."
+      },
+      {
+        question: "The teacher ___ the test results tomorrow.",
+        options: ["will announce", "will be announced", "announces", "announced"],
+        answer: 0,
+        explanation: "The subject (teacher) is doing the action in the future, so it's active voice."
+      },
+      {
+        question: "The thief ___ by the police.",
+        options: ["caught", "was caught", "is catching", "was catching"],
+        answer: 1,
+        explanation: "The thief is not catching anyone. He's receiving the action, so passive voice is correct."
+      },
+      {
+        question: "He ___ the documents while I was out.",
+        options: ["was being signed", "signed", "was signed", "has signed"],
+        answer: 1,
+        explanation: "The subject (he) did the action, so it's active voice in simple past."
+      },
+      {
+        question: "Lunch ___ when I arrived.",
+        options: ["is serving", "was served", "served", "was being served"],
+        answer: 3,
+        explanation: "Lunch is the receiver of the action in past continuous passive form."
+      },
+      {
+        question: "The package ___ by the delivery boy just now.",
+        options: ["was delivered", "delivers", "delivered", "is delivering"],
+        answer: 0,
+        explanation: "The subject (package) receives the action. Passive voice in past simple is correct."
+      },
+      {
+        question: "They ___ the building since morning.",
+        options: ["are painting", "is being painted", "was painting", "have been painting"],
+        answer: 3,
+        explanation: "They are doing the action. Present perfect continuous in active voice is correct."
+      },
+      {
+        question: "The instructions ___ clearly on the packet.",
+        options: ["is written", "are written", "wrote", "was writing"],
+        answer: 1,
+        explanation: "Instructions are not writing themselves. They receive the action. Present simple passive is correct."
+      },
+      {
+        question: "He ___ given a certificate last year.",
+        options: ["is", "was", "was being", "was given"],
+        answer: 3,
+        explanation: "He received the certificate (did not give it). Past passive voice is correct."
+      },
+      {
+        question: "The workers ___ the roof all day.",
+        options: ["were fixing", "was fixed", "is fixing", "fixed"],
+        answer: 0,
+        explanation: "The workers did the action (fixing), so past continuous active voice is correct."
+      }
+    ];
+
+    let currentQuestion = 0;
+    let score = 0;
+
+    const questionNumber = document.getElementById("questionNumber");
+    const questionText = document.getElementById("questionText");
+    const optionsList = document.getElementById("optionsList");
+    const explanation = document.getElementById("explanation");
+    const gifContainer = document.getElementById("gifContainer");
+    const nextBtn = document.getElementById("nextBtn");
+    const correctSound = document.getElementById("correctSound");
+    const wrongSound = document.getElementById("wrongSound");
+    const music = document.getElementById("backgroundMusic");
+    const scoreBoard = document.getElementById("scoreBoard");
+
+    let answered = false;
+
+    function loadQuestion() {
+      const q = questions[currentQuestion];
+      questionNumber.textContent = `Question ${currentQuestion + 1} of ${questions.length}`;
+      questionText.textContent = q.question;
+      optionsList.innerHTML = "";
+      explanation.textContent = "";
+      gifContainer.innerHTML = "";
+      scoreBoard.textContent = `Score: ${score} / ${questions.length}`;
+      nextBtn.style.display = "none";
+      answered = false;
+
+      q.options.forEach((option, index) => {
+        const li = document.createElement("li");
+        li.textContent = option;
+        li.onclick = () => checkAnswer(index, li);
+        optionsList.appendChild(li);
+      });
+    }
+
+    function checkAnswer(selectedIndex, liElement) {
+      if (answered) return;
+      answered = true;
+      const q = questions[currentQuestion];
+      const allOptions = optionsList.querySelectorAll("li");
+
+      allOptions.forEach((li, idx) => {
+        if (idx === q.answer) li.classList.add("correct");
+        if (idx === selectedIndex && idx !== q.answer) li.classList.add("wrong");
+      });
+
+      if (selectedIndex === q.answer) {
+        correctSound.play();
+        gifContainer.innerHTML = `<img src="https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif" width="300" />`;
+        score++;
+      } else {
+        wrongSound.play();
+        gifContainer.innerHTML = `<img src="https://media.giphy.com/media/xUOwGpJ3xNm1SuwpGM/giphy.gif" width="300" />`;
+      }
+
+      explanation.textContent = "Explanation: " + q.explanation;
+      scoreBoard.textContent = `Score: ${score} / ${questions.length}`;
+      nextBtn.style.display = "inline-block";
+    }
+
+    function nextQuestion() {
+      currentQuestion++;
+      if (currentQuestion < questions.length) {
+        loadQuestion();
+      } else {
+        showFinal();
+      }
+    }
+
+    function showFinal() {
+      questionNumber.textContent = "";
+      questionText.textContent = "🎉 You've completed the quiz!";
+      optionsList.innerHTML = "";
+      explanation.textContent = "";
+      gifContainer.innerHTML = `<img src="https://media.giphy.com/media/l0MYGB3EQfzdv9DUI/giphy.gif" width="400" />`;
+      scoreBoard.textContent = `Final Score: ${score} / ${questions.length}`;
+      nextBtn.style.display = "none";
+    }
+
+    function toggleMusic() {
+      music.paused ? music.play() : music.pause();
+    }
+
+    window.onload = () => {
+      loadQuestion();
+    };
+  </script>
+</body>
+</html>
